@@ -64,6 +64,7 @@ lang: cn
   - [以 `z` 开头的命令](#以-z-开头的命令)
   - [搜索](#搜索)
     - [使用额外工具](#使用额外工具)
+      - [配置搜索工具](#配置搜索工具)
       - [常用按键绑定](#常用按键绑定)
       - [在当前文件中进行搜索](#在当前文件中进行搜索)
       - [搜索当前文件所在的文件夹](#搜索当前文件所在的文件夹)
@@ -132,7 +133,7 @@ lang: cn
 
 **欢迎页面**
 
-![welcome-page](https://cloud.githubusercontent.com/assets/13142418/26402270/28ad72b8-40bc-11e7-945e-003f41e057be.png)
+![welcome-page](https://user-images.githubusercontent.com/13142418/45254913-e1e17580-b3b2-11e8-8983-43d6c358a474.png)
 
 **工作界面**
 
@@ -188,17 +189,37 @@ Neovim 运行在 iTerm2 上，采用 SpaceVim，配色为：_base16-solarized-da
 
 初次启动 SpaceVim 时，他将提供选择目录，用户需要选择合适自己的配置模板。此时，SpaceVim 将自动在 `HOME` 目录生成 `~/.SpaceVim.d/init.toml`。所有用户脚本可以存储在`~/.SpaceVim.d/`，这一文件夹将被加入 Vim 的运行时路径 `&runtimepath`。详情清阅读 `:h rtp`。
 
-当然，你也可以通过 `SPACEVIMDIR` 这一环境变量，指定用户配置目录。当然也可以通过软连接连改变目录位置，以便配置备份。
+当然，你也可以通过 `SPACEVIMDIR` 这一环境变量，指定用户配置目录。当然也可以通过软链接来改变目录位置，以便配置备份。
 
 SpaceVim 同时还支持项目本地配置，配置初始文件为，当前目录下的 `.SpaceVim.d/init.toml` 文件。同时当前目录下的 `.SpaceVim.d/` 也将被加入到 Vim 运行时路径。
 
 所有的 SpaceVim 选项可以使用 `:h SpaceVim-config` 来查看。选项名称为原先 Vim 脚本中使用的变量名称去除 `g:spacevim_` 前缀。
 
-如果你需要添加自定义以 `SPC` 为前缀的快捷键，你需要使用 bootstrap function，在其中加入：
+完整的内置文档可以通过 `:h SpaceVim` 进行查阅。也可以通过按键 `SPC h SPC` 模糊搜索，该快捷键需要载入一个模糊搜索的模块。
 
-```vim
-call SpaceVim#custom#SPCGroupName(['G'], '+TestGroup')
-call SpaceVim#custom#SPC('nore', ['G', 't'], 'echom 1', 'echomessage 1', 1)
+**添加自定义插件**
+
+如果你需要添加 github 上的插件，只需要在 SpaceVim 配置文件中添加 `custom_plugins` 片段：
+
+```toml
+[[custom_plugins]]
+    name = "lilydjwg/colorizer"
+    on_cmd = ["ColorHighlight", "ColorToggle"]
+    merged = 0
+```
+
+以上这段配置，添加了插件 `lilydjwg/colorizer`，并且，通过 `on_cmd` 这一选项使得这个插件延迟加载。
+该插件会在第一次执行 `ColorHighlight` 或者 `ColorToggle` 命令时被加载。除了 `on_cmd` 以外，还有一些其他的选项，
+可以通过 `:h dein-options` 查阅。
+
+**禁用插件**
+
+SpaceVim 默认安装了一些插件，如果需要禁用某个插件，可以通过 `disabled_plugins` 这一选项来操作：
+
+```toml
+[options]
+    # 请注意，该值为一个 List，每一个选项为插件的名称，而非 github 仓库地址。
+    disabled_plugins = ["clighter", "clighter8"]
 ```
 
 ### 启动函数
@@ -223,22 +244,40 @@ endf
 
 函数 `bootstrap_before` 将在读取用户配置后执行，而函数 `bootstrap_after` 将在 VimEnter autocmd 之后执行。
 
+如果你需要添加自定义以 `SPC` 为前缀的快捷键，你需要使用 bootstrap function，在其中加入：
+
+```vim
+func! myspacevim#before() abort
+    call SpaceVim#custom#SPCGroupName(['G'], '+TestGroup')
+    call SpaceVim#custom#SPC('nore', ['G', 't'], 'echom 1', 'echomessage 1', 1)
+endf
+```
+
 ### Vim 兼容模式
 
-以下为 SpaceVim 中与 Vim 默认情况下的一些差异，而在兼容模式下，
-以下所有差异将不存在，可以通过设置 `vimcompatible = true` 来启用 Vim 兼容模式。
+以下为 SpaceVim 中与 Vim 默认情况下的一些差异。
 
 - Noraml 模式下 `s` 按键不再删除光标下的字符，在 SpaceVim 中，
-  它是 `Windows` 快捷键的前缀（可以在配置文件中设置成其他按键）。
-  如果希望回复 `s` 按键原先的功能，可以通过 `windows_leader = ""` 使用一个空字符串来禁用这一功能。
-
+  它是窗口相关快捷键的前缀（可以在配置文件中设置成其他按键）。
+  如果希望恢复 `s` 按键原先的功能，可以通过 `windows_leader = ""` 将窗口前缀键设为空字符串来禁用这一功能。
 - Normal 模式下 `,` 按键在 Vim 默认情况下是重复上一次的 `f`、`F`、`t` 和 `T` 按键，但在 SpaceVim 中默认被用作为语言专用的前缀键。如果需要禁用此选项，
   可设置 `enable_language_specific_leader = false`。
-
 - Normal 模式下 `q` 按键在 SpaceVim 中被设置为了智能关闭窗口，
   即大多数情况下按下 `q` 键即可关闭当前窗口。可以通过 `windows_smartclose = ""` 使用一个空字符串来禁用这一功能，或修改为其他按键。
+- 命令行模式下 `Ctrl-a` 按键在 SpaceVim 中被修改为了移动光标至命令行行首。
+- 命令行模式下 `Ctrl-b` 按键被映射为方向键 `<Left>`, 用以向左移动光标。
+- 命令行模式下 `Ctrl-f` 按键被映射为方向键 `<Right>`, 用以向右移动光标。
 
-- 命令行模式下 `<C-a>` 按键在 SpaceVim 中被修改为了移动光标至命令行行首。
+可以通过设置 `vimcompatible = true` 来启用 Vim 兼容模式，而在兼容模式下，
+以上所有差异将不存在。当然，也可通过对应的选项禁用某一个差异。比如，恢复逗号`,`的原始功能，
+可以通过禁用语言专用的前缀键：
+
+```toml
+[options]
+    enable_language_specific_leader = false
+```
+
+如果发现有其他区别，可以[提交 PR](http://spacevim.org/development/)。
 
 ### 私有模块
 
@@ -381,7 +420,7 @@ SpaceVim 在终端下默认使用了真色，因此使用之前需要确认下�
 
 | 快捷键      | 描述               |
 | ----------- | ------------------ |
-| `SPC [1-9]` | 跳至制定序号的窗口 |
+| `SPC [1-9]` | 跳至指定序号的窗口 |
 
 默认主题 gruvbox 的状态栏颜色和模式对照表：
 
@@ -403,7 +442,7 @@ SpaceVim 在终端下默认使用了真色，因此使用之前需要确认下�
 | `SPC t m m` | 显示/隐藏 SpaceVim 已启用功能                                       |
 | `SPC t m M` | 显示/隐藏文件类型                                                   |
 | `SPC t m n` | toggle the cat! (if colors layer is declared in your dotfile)(TODO) |
-| `SPC t m p` | 显示/隐藏鼠标位置信息                                               |
+| `SPC t m p` | 显示/隐藏光标位置信息                                               |
 | `SPC t m t` | 显示/隐藏时间                                                       |
 | `SPC t m d` | 显示/隐藏日期                                                       |
 | `SPC t m T` | 显示/隐藏状态栏                                                     |
@@ -433,7 +472,7 @@ _acpi_ 可展示电池电量剩余百分比.
 | ---------- | ---- |
 | 75% - 100% | 绿色 |
 | 30% - 75%  | 黄色 |
-| 0 - 30%    | 红色 |
+| 0   - 30%  | 红色 |
 
 所有的颜色都取决于不同的主题。
 
@@ -471,8 +510,10 @@ SpaceVim 所支持的分割符以及截图如下：
 
 **状态栏的颜色**
 
-当前版本的状态栏支持 `gruvbox`/`molokai`/`nord`/`one`/`onedark`，如果你需要使用其他主题，
-可以通过以下模板来设置：
+SpaceVim 默认为 [colorcheme 模块](../layers/colorscheme/)所包含的主题颜色提供了状态栏主题，若需要使用其他颜色主题，
+需要自行设置状态栏主题。若未设置，则使用 gruvbox 的主题。
+
+可以参考以下模板来设置：
 
 ```vim
 " the theme colors should be
@@ -510,7 +551,7 @@ function! SpaceVim#mapping#guide#theme#gruvbox#palette() abort
 endfunction
 ```
 
-这一模板是 gruvbox 主题的，如果你需要在切换主题是，状态栏都使用同一种颜色主题，
+这一模板是 gruvbox 主题的，当你需要在切换主题时，状态栏都使用同一种颜色主题，
 可以设置 `custom_color_palette`：
 
 ```toml
@@ -543,7 +584,7 @@ custom_color_palette = [
 | `<Leader> 8` | 跳至标签栏序号 8 |
 | `<Leader> 9` | 跳至标签栏序号 9 |
 
-标签栏上也支持鼠标操作，左键可以快速切换至该序号，中键删除该标签。该特性只支持 neovim，并且需要 `has('tablineat')` 特性。
+标签栏上也支持鼠标操作，左键可以快速切换至该标签，中键删除该标签。该特性只支持 neovim，并且需要 `has('tablineat')` 特性。
 
 | 按键             | 描述         |
 | ---------------- | ------------ |
@@ -789,12 +830,12 @@ call SpaceVim#custom#SPC('nnoremap', ['f', 't'], 'echom "hello world"', 'test cu
 
 Denite/Unite 是一个强大的信息筛选浏览器，这类似于 emacs 中的 [Helm](https://github.com/emacs-helm/helm)。以下这些快捷键将帮助你快速获取需要的帮助信息：
 
-| 快捷键      | 描述                                         |
-| ----------- | -------------------------------------------- |
-| `SPC h SPC` | 使用 fuzzy find 模块展示 SpaceVim 帮助文档章节目录    |
-| `SPC h i`   | 获取光标下单词的帮助信息                     |
-| `SPC h k`   | 使用快捷键导航，展示 SpaceVim 所支持的前缀键 |
-| `SPC h m`   | 使用 Unite 浏览所有 man 文档                 |
+| 快捷键      | 描述                                               |
+| ----------- | -------------------------------------------------- |
+| `SPC h SPC` | 使用 fuzzy find 模块展示 SpaceVim 帮助文档章节目录 |
+| `SPC h i`   | 获取光标下单词的帮助信息                           |
+| `SPC h k`   | 使用快捷键导航，展示 SpaceVim 所支持的前缀键       |
+| `SPC h m`   | 使用 Unite 浏览所有 man 文档                       |
 
 报告一个问题：
 
@@ -939,8 +980,8 @@ merged = 0
 | `SPC w TAB`/`<Tab>`  | 在统一标签内进行窗口切换                                                       |
 | `SPC w =`            | 对齐分离的窗口                                                                 |
 | `SPC w b`            | force the focus back to the minibuffer (TODO)                                  |
-| `SPC w c`            | 进入阅读模式，浏览当前窗口 (需要 tools 模块)                                                     |
-| `SPC w C`            | 选择某一个窗口，并且进入阅读模式 (需要 tools 模块)                                               |
+| `SPC w c`            | 进入阅读模式，浏览当前窗口 (需要 tools 模块)                                   |
+| `SPC w C`            | 选择某一个窗口，并且进入阅读模式 (需要 tools 模块)                             |
 | `SPC w d`            | 删除一个窗口                                                                   |
 | `SPC u SPC w d`      | delete a window and its current buffer (does not delete the file) (TODO)       |
 | `SPC w D`            | 选择一个窗口，并且关闭                                                         |
@@ -1022,6 +1063,7 @@ Buffer 操作相关快捷键都是已 `SPC b` 为前缀的：
 
 | 快捷键      | 描述                                                   |
 | ----------- | ------------------------------------------------------ |
+| `SPC f /`   | 使用 `find` 命令查找文件，支持参数提示                 |
 | `SPC f b`   | 跳至文件书签                                           |
 | `SPC f c`   | copy current file to a different location(TODO)        |
 | `SPC f C d` | 修改文件编码 unix -> dos                               |
@@ -1091,7 +1133,7 @@ SpaceVim 的文件树提供了版本控制信息的接口，但是这一特性�
 
 ##### 文件树中打开文件
 
-如果只有一个可编辑窗口，则在该窗口中打开选择的文件，否则则需要制定窗口来打开文件：
+如果只有一个可编辑窗口，则在该窗口中打开选择的文件，否则则需要指定窗口来打开文件：
 
 | 快捷键         | 描述             |
 | -------------- | ---------------- |
@@ -1249,6 +1291,36 @@ Notes:
 - 也可以通过将它们标记在联合缓冲区来一次搜索多个目录.
   **注意** 如果你使用 `pt`, [TCL parser tools](https://core.tcl.tk/tcllib/doc/trunk/embedded/www/tcllib/files/apps/pt.html) 
   同时也需要安装一个名叫 `pt` 的命令行工具.
+
+##### 配置搜索工具
+
+若需要修改默认搜索工具的选项，可以使用启动函数，在启动函数中配置各种搜索工具的默认选项。
+下面是一个修改 `rg` 默认搜索选项的配置示例：
+
+```vim
+function! myspacevim#before() abort
+    let profile = SpaceVim#mapping#search#getprofile('rg')
+    let default_opt = profile.default_opts + ['--no-ignore-vcs']
+    call SpaceVim#mapping#search#profile({'rg' : {'default_opts' : default_opt}})
+endfunction
+```
+
+搜索工具配置结构为：
+
+```vim
+" { 'ag' : { 
+"   'namespace' : '',         " a single char a-z
+"   'command' : '',           " executable
+"   'default_opts' : [],      " default options
+"   'recursive_opt' : [],     " default recursive options
+"   'expr_opt' : '',          " option for enable expr mode
+"   'fixed_string_opt' : '',  " option for enable fixed string mode
+"   'ignore_case' : '',       " option for enable ignore case mode
+"   'smart_case' : '',        " option for enable smart case mode
+"   }
+"  }
+```
+
 
 ##### 常用按键绑定
 
