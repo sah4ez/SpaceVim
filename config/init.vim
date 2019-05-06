@@ -16,8 +16,7 @@ try
     silent exec 'language en_US'
   else
     let s:uname = system('uname -s')
-    if s:uname ==# "Darwin\n"
-      " in mac-terminal
+    if s:uname ==# "Darwin\n" " in mac-terminal
       silent exec 'language en_US'
     elseif s:uname ==# "SunOS\n"
       " in Sun-OS terminal
@@ -72,6 +71,8 @@ let g:spacevim_custom_plugins = [
   \ ['cespare/vim-toml',           { 'on_ft' : 'toml' }],
   \ ['ensime/ensime-vim',          { 'on_ft' : 'scala' }],
   \ ['derekwyatt/vim-scala',       { 'on_ft' : 'scala' }],
+  \ ['racer-rust/vim-racer',       { 'on_ft' : 'rust' }],
+  \ ['rust-lang/rust.vim',         { 'on_ft' : 'rust' }],
   \ ['aklt/plantuml-syntax'],
   \ ['airblade/vim-gitgutter'],
   \ ['terryma/vim-multiple-cursors'],
@@ -79,6 +80,15 @@ let g:spacevim_custom_plugins = [
   \ ['junegunn/gv.vim'],
   \ ['tpope/vim-fugitive'],
   \ ['chr4/nginx.vim'],
+  \ ['will133/vim-dirdiff'],
+  \ ['bumaociyuan/vim-swift'],
+  \ ['tell-k/vim-autopep8'],
+  \ ['apple/apple-swift-vim'],
+  \ ['sah4ez/vim-bitbucket-comments'],
+  \ ['natebosch/vim-lsc',         { 'on_ft' : 'c' }],
+  \ ['dbeniamine/cheat.sh-vim'],
+  \ ['justinmk/vim-sneak'],
+  \ ['tpope/vim-repeat'],
   \ ]
 
 let g:spacevim_filemanager = 'nerdtree'
@@ -89,7 +99,7 @@ nnoremap <silent> <F9> :TagbarToggle<CR>
 nnoremap <leader>a <F9> :TagbarToggle<CR>
 nnoremap <space>lga :Gblame<CR>
 
-autocmd FileType golang nested :GoGuruScope /home/sah4ez/go/src
+autocmd FileType golang nested :GoGuruScope /home/sah4ez/go/src/...
 "autocmd BufRead /home/sah4ez/go/src/*.go silent :TagbarOpen
 
 autocmd VimEnter * nested :call tagbar#autoopen(1)
@@ -119,6 +129,7 @@ let g:go_metalinter_autosave_enabled = ['golint']
 let g:go_metalinter_deadline = "5s"
 
 let g:go_auto_sameids = 1
+let g:go_def_mode='gopls'
 
 nnoremap <space>lbr :GoReferrers<CR>
 nnoremap <space>lbf :GoFmt<CR>
@@ -147,3 +158,66 @@ set spell spelllang=en_us
 " scala
 " autocmd BufWritePost *.scala silent :EnTypeCheck
 " nnoremap <localleader>t :EnType<CR>
+
+
+" rust
+let g:rustfmt_autosave = 1
+nnoremap <space>lrf :RustFmt<CR>
+
+" swift
+let g:syntastic_swift_checkers = ['swiftpm', 'swiftlint']
+let g:tagbar_type_swift = {
+  \ 'ctagstype': 'swift',
+  \ 'kinds' : [
+    \ 'n:Enums',
+    \ 't:Typealiases',
+    \ 'p:Protocols',
+    \ 's:Structs',
+    \ 'c:Classes',
+    \ 'f:Functions',
+    \ 'v:Variables',
+    \ 'e:Extensions'
+  \ ],
+  \ 'sort' : 0
+\ }
+
+
+" python
+autocmd FileType python set equalprg=autopep8\ -
+let g:autopep8_on_save = 1
+let g:autopep8_ignore="E501"
+let g:autopep8_pep8_passes=100
+
+" set runtimepath^=~/.cache/vimfiles/repos/github.com/sah4ez/vim-bitbucket-comments/
+" nnoremap <space>lcc :call comments#Load()<CR>
+" nnoremap <space>lcd :call comments#Download()<CR>
+" nnoremap <space>lcm :call comments#MakeComment()<CR>
+" autocmd BufRead *.comments :set syntax=comments
+
+let g:lsc_server_commands = {
+  \ 'c': 'cquery --init="{\"cacheDirectory\": \"/tmp/cquery_cache\"}"',
+  \ 'cpp': 'cquery --init="{\"cacheDirectory\": \"/tmp/cquery_cache\"}"',
+  \ 'python' : 'pyls',
+  \ }
+
+" nnoremap <space>lbr :GoReferrers<CR>
+" nnoremap <space>lbf :GoFmt<CR>
+" nnoremap <space>ltf :GoTestFunc<CR>
+
+autocmd BufReadPre *.{c,cpp,h} nnoremap gd :LSClientGoToDefinition<CR>
+autocmd BufReadPre *.{c,cpp,h} nnoremap gD :vertical LSClientGoToDefinitionSplit<CR>
+autocmd BufReadPre *.{c,cpp,h} nnoremap <space>gr :LSClientFindReferenc<CR>
+autocmd BufReadPre *.{c,cpp,h} nnoremap <space>gR :LSClientRename<CR>
+autocmd BufReadPre *.{c,cpp,h} nnoremap <space>gi :LSClientFindImplementations<CR>
+autocmd BufReadPre *.{c,cpp,h} nnoremap <space>gS :LSClientWorkspaceSymbol<CR>
+" autocmd BufReadPre *.{c,cpp,h} nnoremap <space>lmg :LSClientGoToDefinition<CR>
+" autocmd BufReadPre *.{c,cpp,h} nnoremap <space>lmg :LSClientGoToDefinition<CR>
+" autocmd BufReadPre *.{c,cpp,h} nnoremap <space>lmg :LSClientGoToDefinition<CR>
+" autocmd BufReadPre *.{c,cpp,h} nnoremap <space>lmg :LSClientGoToDefinition<CR>
+" autocmd BufReadPre *.{c,cpp,h} nnoremap <space>lmg :LSClientGoToDefinition<CR>
+"
+
+nmap <space>jF <plug>(easymotion-F)
+nmap <space>jf <plug>(easymotion-f)
+nmap ; <plug>(easymotion-next)
+nmap <space>; <plug>(easymotion-prev)
