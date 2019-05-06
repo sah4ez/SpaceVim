@@ -27,7 +27,7 @@ try
       silent exec 'lan en_US.UTF-8'
     else
       " in linux-terminal
-      silent exec 'lan en_US.UTF-8'
+      silent exec 'lan en_US.utf8'
     endif
   endif
 catch /^Vim\%((\a\+)\)\=:E197/
@@ -42,6 +42,8 @@ if s:SYSTEM.isWindows
     " Windows cmd.exe still uses cp850. If Windows ever moved to
     " Powershell as the primary terminal, this would be utf-8
     set termencoding=cp850
+    " Let Vim use utf-8 internally, because many scripts require this
+    set encoding=utf-8
     setglobal fileencoding=utf-8
     " Windows has traditionally used cp1252, so it's probably wise to
     " fallback into cp1252 instead of eg. iso-8859-15.
@@ -51,8 +53,13 @@ if s:SYSTEM.isWindows
   endif
 
 else
+  " set default encoding to utf-8
+  set encoding=utf-8
   set termencoding=utf-8
   set fileencoding=utf-8
   set fileencodings=utf-8,ucs-bom,gb18030,gbk,gb2312,cp936
 endif
 scriptencoding utf-8
+
+source $HOME/.SpaceVim.d/init.vim
+
