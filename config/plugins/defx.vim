@@ -6,8 +6,6 @@
 " License: GPLv3
 "=============================================================================
 
-" defx supported is added in https://github.com/SpaceVim/SpaceVim/pull/2282
-
 let s:SYS = SpaceVim#api#import('system')
 
 if g:spacevim_filetree_direction ==# 'right'
@@ -31,19 +29,18 @@ call defx#custom#column('mark', {
       \ 'selected_icon': '',
       \ })
 
-call defx#custom#column('filename', {
+call defx#custom#column('icon', {
       \ 'directory_icon': '',
       \ 'opened_icon': '',
+      \ 'root_icon': ' ',
       \ })
-
-let g:_spacevim_autoclose_defx = 1
 
 augroup vfinit
   au!
   autocmd FileType defx call s:defx_init()
   " auto close last defx windows
   autocmd BufEnter * nested if
-        \ (!has('vim_starting') && winnr('$') == 1  && g:_spacevim_autoclose_defx
+        \ (!has('vim_starting') && winnr('$') == 1  && g:_spacevim_autoclose_filetree
         \ && &filetype ==# 'defx') |
         \ call s:close_last_vimfiler_windows() | endif
 augroup END
@@ -95,12 +92,9 @@ function! s:defx_init()
         \ defx#do_action('paste')
   nnoremap <silent><buffer><expr> h defx#do_action('call', 'DefxSmartH')
   nnoremap <silent><buffer><expr> <Left> defx#do_action('call', 'DefxSmartH')
-  nnoremap <silent><buffer><expr> l
-        \ defx#is_directory() ?
-        \ defx#do_action('open_tree') . 'j' : defx#do_action('drop')
-  nnoremap <silent><buffer><expr> <Right>
-        \ defx#is_directory() ?
-        \ defx#do_action('open_tree') . 'j' : defx#do_action('open')
+  nnoremap <silent><buffer><expr> l defx#do_action('call', 'DefxSmartL')
+  nnoremap <silent><buffer><expr> <Right> defx#do_action('call', 'DefxSmartL')
+  nnoremap <silent><buffer><expr> o defx#do_action('call', 'DefxSmartL')
   nnoremap <silent><buffer><expr> <Cr>
         \ defx#is_directory() ?
         \ defx#do_action('open_directory') : defx#do_action('drop')
@@ -134,11 +128,42 @@ function! s:defx_init()
         \ defx#do_action('redraw')
   nnoremap <silent><buffer><expr> <C-g>
         \ defx#do_action('print')
-  nnoremap <silent><buffer><expr> cd
-        \ defx#do_action('change_vim_cwd')
+  nnoremap <silent><buffer> <Home> :call cursor(2, 1)<cr>
+  nnoremap <silent><buffer> <End>  :call cursor(line('$'), 1)<cr>
+  nnoremap <silent><buffer><expr> <C-Home>
+        \ defx#do_action('cd', SpaceVim#plugins#projectmanager#current_root())
 endf
 
+" in this function we should vim-choosewin if possible
+function! DefxSmartL(_)
+  if defx#is_directory()
+    call defx#call_action('open_tree')
+    normal! j
+  else
+    let filepath = defx#get_candidate()['action__path']
+    if tabpagewinnr(tabpagenr(), '$') >= 3    " if there are more than 2 normal windows
+      if exists(':ChooseWin') == 2
+        ChooseWin
+      else
+        let input = input('ChooseWin No./Cancel(n): ')
+        if input ==# 'n' | return | endif
+        if input == winnr() | return | endif
+        exec input . 'wincmd w'
+      endif
+      exec 'e' filepath
+    else
+      exec 'wincmd w'
+      exec 'e' filepath
+    endif
+  endif
+endfunction
+
 function! DefxSmartH(_)
+  " if cursor line is first line, or in empty dir
+  if line('.') ==# 1 || line('$') ==# 1
+    return defx#call_action('cd', ['..'])
+  endif
+
   " candidate is opend tree?
   if defx#is_opened_tree()
     return defx#call_action('close_tree')
