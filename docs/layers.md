@@ -3,7 +3,7 @@ title: Available layers
 description: "A guide for managing SpaceVim with layers, tell you how to enable and disable a layer, also list all available layers in SpaceVim"
 ---
 
-# Available layers
+# [Home](../) >> Layers
 
 <!-- vim-markdown-toc GFM -->
 
@@ -76,6 +76,7 @@ Some layers are enabled by default. The following example shows how to disable `
 | [core#tabline](core/tabline/)                         | SpaceVim core#tabline layer provides a better tabline for SpaceVim                                                                                                  |
 | [core](core/)                                         | SpaceVim core layer provides many default key bindings and features.                                                                                                |
 | [cscope](cscope/)                                     | cscope layer provides a smart cscope and pycscope helper for SpaceVim, help users win at cscope                                                                     |
+| [ctrlspace](ctrlspace/)                               | This layer provides a customized CtrlSpace centric workflow                                                                                                         |
 | [ctrlp](ctrlp/)                                       | This layers provide a heavily customized ctrlp centric work-flow                                                                                                    |
 | [debug](debug/)                                       | This layer provide debug workflow support in SpaceVim                                                                                                               |
 | [default](default/)                                   | SpaceVim default layer contains no plugins, but It provides some better default config for SpaceVim.                                                                |
@@ -110,6 +111,7 @@ Some layers are enabled by default. The following example shows how to disable `
 | [lang#fsharp](lang/fsharp/)                           | This layer adds FSharp language support to SpaceVim                                                                                                                 |
 | [lang#go](lang/go/)                                   | This layer is for golang development. It also provides additional language-specific key mappings.                                                                   |
 | [lang#goby](lang/goby/)                               | This layer is for goby development, provide syntax checking, code runner and repl support for goby file.                                                            |
+| [lang#gosu](lang/gosu/)                               | This layer is for gosu development, provide syntax checking, code runner and repl support for gosu file.                                                            |
 | [lang#graphql](lang/graphql/)                         | This layer adds GraphQL file support to SpaceVim                                                                                                                    |
 | [lang#groovy](lang/groovy/)                           | This layer is for Groovy development, provide syntax checking, code runner and repl support for groovy file.                                                        |
 | [lang#hack](lang/hack/)                               | This layer is for hack development, provide syntax checking, code runner and repl support for hack file.                                                            |

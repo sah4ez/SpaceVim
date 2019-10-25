@@ -26,7 +26,7 @@ function! SpaceVim#plugins#searcher#find(expr, exe) abort
         \ })
   if id > 0
     echohl Comment
-    echo 'seraching: ' . expr
+    echo 'searching: ' . expr
     echohl None
   endif
 endfunction
@@ -89,7 +89,8 @@ function! SpaceVim#plugins#searcher#count() abort
   endif
 endfunction
 nnoremap <silent> <Plug>(nohlsearch) :nohlsearch<Cr>
-function! SpaceVim#plugins#searcher#clear()
+
+function! SpaceVim#plugins#searcher#clear() abort
   call feedkeys("\<Plug>(nohlsearch)")
   let s:rst = []
   call setqflist([])

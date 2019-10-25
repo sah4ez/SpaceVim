@@ -216,7 +216,7 @@ function! SpaceVim#layers#core#config() abort
     call SpaceVim#mapping#space#def('nnoremap', ['f', 't'], 'Defx', 'toggle-file-tree', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['f', 'T'], 'Defx -no-toggle', 'show-file-tree', 1)
     call SpaceVim#mapping#space#def('nnoremap', ['f', 'o'], "Defx  -no-toggle -search=`expand('%:p')` `stridx(expand('%:p'), getcwd()) < 0? expand('%:p:h'): getcwd()`", 'open-file-tree', 1)
-    call SpaceVim#mapping#space#def('nnoremap', ['b', 't'], 'Defx -no-toggle', 'show-file-tree-at-buffer-dir', 1)
+    call SpaceVim#mapping#space#def('nnoremap', ['b', 't'], 'exe "Defx -no-toggle " . fnameescape(expand("%:p:h"))', 'show-file-tree-at-buffer-dir', 1)
   endif
   call SpaceVim#mapping#space#def('nnoremap', ['f', 'y'], 'call SpaceVim#util#CopyToClipboard()', 'show-and-copy-buffer-filename', 1)
   let g:_spacevim_mappings_space.f.v = {'name' : '+Vim/SpaceVim'}
@@ -758,4 +758,15 @@ function! s:explore_current_dir(cur) abort
       Defx -no-toggle
     endif
   endif
+endfunction
+
+
+let g:_spacevim_filetree_show_hidden_files = 0
+
+function! SpaceVim#layers#core#set_variable(var) abort
+
+  let g:_spacevim_filetree_show_hidden_files = get(a:var,
+        \ 'filetree_show_hidden',
+        \ g:_spacevim_filetree_show_hidden_files)
+
 endfunction
