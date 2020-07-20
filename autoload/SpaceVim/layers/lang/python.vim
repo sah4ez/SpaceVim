@@ -140,18 +140,23 @@ function! s:language_specified_mappings() abort
   if s:format_on_save
     augroup SpaceVim_layer_lang_python
       autocmd!
-      autocmd BufWritePost *.py Neoformat yapf
+      autocmd BufWritePre *.py undojoin | Neoformat
     augroup end
   endif
 
 endfunction
 
+
+function! s:Shebang_to_cmd(line) abort
+  let executable = matchstr(a:line, '#!\s*\zs[^ ]*')
+  let argvs = split(matchstr(a:line, '#!\s*[^ ]\+\s*\zs.*'))
+  return [executable] + argvs
+endfunction
+
 func! s:getexe() abort
   let line = getline(1)
   if line =~# '^#!'
-    let exe = split(line)
-    let exe[0] = exe[0][2:]
-    return exe
+    return s:Shebang_to_cmd(line)
   endif
   return ['python']
 endf

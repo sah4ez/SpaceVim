@@ -189,6 +189,21 @@ function! s:denite_filter_my_settings() abort
   inoremap <silent><buffer> <S-Tab>
         \ <Esc><C-w>p:call cursor(line('.')-1,0)<CR><C-w>pA
   inoremap <silent><buffer><expr> <CR> denite#do_map('do_action')
+  " @fixme use this key binding only for sources which has delete action
+  inoremap <silent><buffer><expr> <C-d>
+        \ <SID>delete_action()
+  if exists('*deoplete#custom#buffer_option')
+    call deoplete#custom#buffer_option('auto_complete', v:false)
+  endif
+endfunction
+
+
+function! s:delete_action() abort
+  if SpaceVim#layers#core#statusline#denite_status("sources") =~# '^buffer'
+    return denite#do_map('do_action', 'delete')
+  else
+    return ''
+  endif
 endfunction
 
 
